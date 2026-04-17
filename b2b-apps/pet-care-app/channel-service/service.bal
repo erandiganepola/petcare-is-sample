@@ -327,9 +327,11 @@ service / on new http:Listener(9091) {
 
         UserInfo|error userInfo = userInfoResolver.retrieveUserInfo(headers);
         if userInfo is error {
+            log:printError("Error retrieving user info", userInfo);
             return userInfo;
         }
 
+        log:printInfo("Retrieving organization info for", org=userInfo.organization);
         OrgInfo|()|error orgInfo = getOrgInfo(userInfo.organization);
         if orgInfo is OrgInfo {
             return orgInfo;

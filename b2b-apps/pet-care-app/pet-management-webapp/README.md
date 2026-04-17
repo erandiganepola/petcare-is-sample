@@ -15,6 +15,7 @@ npm install
 Replace the values correctly, then export them to the terminal.
 ```
 export NEXTAUTH_URL=http://localhost:3001
+export SECRET=<generate-with-openssl-rand-base64-32>
 export BASE_ORG_URL=https://api.asgardeo.io/t/<ParentOrg>
 export CHANNELLING_SERVICE_URL=<CHANNEL_SERVICE_URL>
 export PET_MANAGEMENT_SERVICE_URL=<PET_SERVICE_URL>
@@ -39,10 +40,8 @@ export MANAGEMENT_APP_CLIENT_SECRET=<CLIENT_ID_OF_MANAGEMENT_APP>
   cp server.js dist/apps/business-admin-app/
   cd dist/apps/business-admin-app/
   export NODE_ENV=production
-  export NEXTAUTH_SECRET=V9Ogd83zDs4BtBqZf7rw7fVx/7KrYQfA+8LO2BMuJvo=
+  export SECRET=<generate-with-openssl-rand-base64-32>
   node server.js
   ```
 
   The app should open at [`http://localhost:3001`](http://localhost:3001)
-
-  

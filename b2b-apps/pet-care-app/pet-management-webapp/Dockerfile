@@ -40,6 +40,5 @@ EXPOSE 3002
 
 ENV NODE_ENV=production
 ENV PORT 3002
-ENV NEXTAUTH_SECRET=V9Ogd83zDs4BtBqZf7rw7fVx/7KrYQfA+8LO2BMuJvo=
 
 CMD ["node", "server.js"]

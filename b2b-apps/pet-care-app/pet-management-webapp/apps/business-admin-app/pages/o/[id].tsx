@@ -83,32 +83,38 @@ export default function Org(props : OrgProps) {
     }, [ routerQuery ]);
 
     useEffect(() => {
-        getDoctor(session.accessToken, session.user.emails[0])
-            .catch((err) => {
-                if (err.response.status === 404 && session.group === "doctor") {
-                    const payload: DoctorInfo = {
-                        address: "",
-                        availability: [],
-                        dateOfBirth: "",
-                        emailAddress: session.user.emails[0],
-                        gender: "",
-                        name: session.user.name.givenName + " " + session.user.name.familyName,
-                        registrationNumber: Math.floor(100000 + Math.random() * 900000).toString(),
-                        specialty: "N/A"
-                    };
-                    
-                    postDoctor(session.accessToken, payload);
-                }
-            });
+        if (session?.user?.emails) {
+            getDoctor(session.accessToken, session.user.emails[0])
+                .catch((err) => {
+                    if (err.response.status === 404 && session.group === "doctor") {
+                        const payload: DoctorInfo = {
+                            address: "",
+                            availability: [],
+                            dateOfBirth: "",
+                            emailAddress: session.user.emails[0],
+                            gender: "",
+                            name: session.user.name.givenName + " " + session.user.name.familyName,
+                            registrationNumber: Math.floor(100000 + Math.random() * 900000).toString(),
+                            specialty: "N/A"
+                        };
+
+                        postDoctor(session.accessToken, payload);
+                    }
+                });
+        }
         
         getPersonalization(session.orgId)
             .then((response) => {
                 personalize(response.data);
             })
             .catch(async (err) => {
-                if (err.response.status === 404 && session.group === "admin") {
+                if (err.response?.status === 404 && session.group === "admin") {
                     const res: BrandingPreference = 
                         (await controllerDecodeGetBrandingPreference(session) as BrandingPreference);
+                    if (!res) {
+                        console.error("Theme preference not found in the response");
+                        return;
+                    }
                     const activeTheme: string = res["preference"]["theme"]["activeTheme"];
 
                     const newPersonalization: Personalization = {

@@ -41,7 +41,7 @@ const wso2ISProvider = (req: NextApiRequest, res: NextApiResponse) => NextAuth(r
                 token.accessToken = account.access_token;
                 token.idToken = account.id_token;
                 token.scope = account.scope;
-                token.user = profile;
+                token.roles = profile?.[ "roles" ];
             }
 
             return token;
@@ -66,7 +66,7 @@ const wso2ISProvider = (req: NextApiRequest, res: NextApiResponse) => NextAuth(r
                 session.orgId = getOrgId(token.idToken as unknown as JWT);
                 session.orgName = getOrgName(token.idToken as unknown as JWT);
                 
-                let rolesList: string[]|string = token.user[ "roles" ];
+                let rolesList: string[]|string = token.roles as string[]|string;
                 
                 if (typeof rolesList === "string") {
                     rolesList = [ rolesList ];

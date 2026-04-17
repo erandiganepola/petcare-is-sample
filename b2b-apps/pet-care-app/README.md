@@ -655,6 +655,9 @@ A management application must be created in order to use the Asagrdeo management
     - NEXTAUTH_URL
         - Use **Web App URL** in the step 3.2.
 
+    - SECRET
+        - Generate a random value with `openssl rand -base64 32`.
+
     - MANAGEMENT_APP_CLIENT_ID
         - Navigate to the **Asgardeo Console**, go to **Applications**
         - Click on the management app (`Pet Care Admin App`) created.
@@ -769,3 +772,82 @@ Now you can login as the Pet Owner and perform Pet Owner related tasks in the Pe
 6. If you go to the **Channel a Doctor** page, you can channel a doctor.
 
 ![Alt text](readme-resources/pet-owner-view.png?raw=true "Pet Owner Home Page")
+
+&nbsp;<br>
+---
+
+# Appendix: Running the application locally
+
+The steps above deploy the application to Choreo. If you want to run it on your local machine for development or testing, follow the steps below. You still need an Asgardeo tenant and applications configured as described in **Step 4**, since authentication cannot be run locally.
+
+## Prerequisites
+
+- [Ballerina](https://ballerina.io/downloads/) (Swan Lake `2201.5.0` or later) to run the backend services.
+- [Node.js](https://nodejs.org/) `18` or later and `npm` to run the web application.
+- An Asgardeo tenant, sub-organization, and applications configured as per **Step 4**.
+- (Optional) A MySQL server running on `localhost:3306`. If not provided, the services fall back to in-memory storage. If you use MySQL, create the databases using the schemas shown in **Step 1.4** and **Step 1.6**.
+
+## Step A: Start the Ballerina services
+
+Each service runs on its own port. Open a terminal for each service and run `bal run` from the service directory.
+
+| Service | Directory | Port |
+| ------- | --------- | ---- |
+| Email Service | `b2b-apps/pet-care-app/email-service` | 9090 |
+| Channel Service | `b2b-apps/pet-care-app/channel-service` | 9091 |
+| Pet Management Service | `b2b-apps/pet-care-app/pet-management-service` | 9092 |
+| Personalization Service | `b2b-apps/pet-care-app/personalization-service` | 9093 |
+
+```bash
+cd b2b-apps/pet-care-app/email-service && bal run
+cd b2b-apps/pet-care-app/channel-service && bal run
+cd b2b-apps/pet-care-app/pet-management-service && bal run
+cd b2b-apps/pet-care-app/personalization-service && bal run
+```
+
+If a port is already in use (for example, Kafka commonly listens on `9092`/`9093`), stop the conflicting process or change the listener port in the corresponding `service.bal`. If you want to back the services with MySQL, update the `Config.toml` in each service directory with your database credentials.
+
+## Step B: Register local redirect URLs in Asgardeo
+
+In the `Pet Care App` and `Pet Care Admin App` applications you created in **Step 4.2** and **Step 4.3**, add the following to **Authorized redirect URLs** and **Allowed origins**:
+
+- `http://localhost:3002`
+- `http://localhost:3002/api/auth/callback/wso2isAdmin`
+
+## Step C: Configure the web application
+
+Copy `.env.example` to `.env.local` in `b2b-apps/pet-care-app/pet-management-webapp/apps/business-admin-app`, then replace the placeholders using the same lookups described in **Step 5.1**. Generate `SECRET` with `openssl rand -base64 32`.
+
+```bash
+NEXTAUTH_URL=http://localhost:3002
+SECRET=<generate-with-openssl-rand-base64-32>
+HOSTED_URL=http://localhost:3002
+
+BASE_URL=https://api.asgardeo.io
+BASE_ORG_URL=https://api.asgardeo.io/t/<your-asgardeo-org-name>
+SHARED_APP_NAME=<name-of-the-pet-care-app-in-devportal>
+
+CLIENT_ID=<pet-care-app-consumer-key>
+CLIENT_SECRET=<pet-care-app-consumer-secret>
+
+MANAGEMENT_APP_CLIENT_ID=<pet-care-admin-app-client-id>
+MANAGEMENT_APP_CLIENT_SECRET=<pet-care-admin-app-client-secret>
+
+CHANNELLING_SERVICE_URL=http://localhost:9091
+PET_MANAGEMENT_SERVICE_URL=http://localhost:9092
+PERSONALIZATION_SERVICE_URL=http://localhost:9093
+
+NODE_TLS_REJECT_UNAUTHORIZED=0
+```
+
+## Step D: Start the web application
+
+From the webapp root:
+
+```bash
+cd b2b-apps/pet-care-app/pet-management-webapp
+npm install
+npx nx serve business-admin-app
+```
+
+The application is available at `http://localhost:3002`. Sign in using the sub-organization and users configured in **Step 4.1**.
