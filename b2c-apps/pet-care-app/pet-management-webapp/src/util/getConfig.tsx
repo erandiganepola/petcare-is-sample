@@ -16,12 +16,15 @@
  * under the License.
  */
 
+import { Storage } from "@asgardeo/auth-react";
+
 interface Config {
     baseUrl: string;
     clientID: string;
     scope: string[];
     signInRedirectURL: string;
     signOutRedirectURL: string;
+    storage: Storage.LocalStorage | Storage.SessionStorage | Storage.BrowserMemory;
     resourceServerURL: string;
   }
 
@@ -36,6 +39,7 @@ const authConfig = {
     clientID: window.config.clientID,
     signInRedirectURL: window.config.signInRedirectURL,
     signOutRedirectURL: window.config.signOutRedirectURL,
+    storage: window.config.storage,
     resourceServerURL: window.config.resourceServerURL,
     scope: ["openid", "profile", "email"],
   };
@@ -43,5 +47,3 @@ const authConfig = {
 export function getConfig() {
     return authConfig;
 }
-
-

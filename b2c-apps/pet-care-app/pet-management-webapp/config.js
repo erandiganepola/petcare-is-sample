@@ -3,5 +3,6 @@ window.config = {
     clientID: "OveGoDcN7Ub13l2NWaRIyMif30ka",
     signInRedirectURL: "http://localhost:5173",
     signOutRedirectURL: "http://localhost:5173",
+    storage: "localStorage",
     resourceServerURL: "http://localhost:5173"
 };
