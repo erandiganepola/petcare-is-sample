@@ -86,7 +86,7 @@ export default function Org(props : OrgProps) {
         if (session?.user?.emails) {
             getDoctor(session.accessToken, session.user.emails[0])
                 .catch((err) => {
-                    if (err.response.status === 404 && session.group === "doctor") {
+                    if (err.response?.status === 404 && session.group === "doctor") {
                         const payload: DoctorInfo = {
                             address: "",
                             availability: [],
